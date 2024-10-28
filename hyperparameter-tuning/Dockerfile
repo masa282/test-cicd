@@ -5,7 +5,6 @@ WORKDIR /app
 
 COPY task.py /app
 COPY requirements.txt /app
-COPY .env /app
 
 
 # 必要なPythonライブラリをインストール
