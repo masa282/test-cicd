@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: xgboost-tuning-job
+spec:
+  parallelism: 5
+  template:
+    spec:
+      containers:
+      - name: xgboost-tuning
+        image: gcr.io/ferrous-biplane-435203-e4/xgboost-tuning-task2:latest
+        args:
+          - /bin/sh
+          - -c
+          - |
+            python task.py --study-name="boston-xgboost_$(date +'%Y-%m-%d')" --n-trials=10
+        env:
+        - name: MLFLOW_TRACKING_URI
+          value: "http://mlflow-service.boston.svc.cluster.local:5000" 
+        volumeMounts:
+        - name: model-output
+          mountPath: /output
+      restartPolicy: Never
+      volumes:
+      - name: model-output
+        persistentVolumeClaim:
+          claimName: model-output-pvc
+  backoffLimit: 4

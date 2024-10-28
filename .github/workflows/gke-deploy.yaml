@@ -1,0 +1,42 @@
+# .github/workflows/gke-deploy.yml
+name: Deploy to GKE on train.py changes
+
+on:
+  push:
+    paths:
+      - "train.py"
+      - ".github/workflows/gke-deploy.yml"
+      - "hyperparameter-tuning/Dockerfile"
+      - "hyperparameter-tuning/requirements.txt"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0.2.0
+      with:
+        project_id: ${{ secrets.GCLOUD_PROJECT }}
+        service_account_key: ${{ secrets.GCLOUD_KEY }}
+
+    - name: Authenticate Docker to Google Container Registry
+      run: |
+        echo "${{ secrets.GCLOUD_KEY }}" | docker login -u _json_key --password-stdin https://gcr.io
+
+    - name: Build and Push Docker image
+      run: |
+        IMAGE_NAME=gcr.io/${{ secrets.GCLOUD_PROJECT }}/xgboost-tuning-task2
+        docker build -t $IMAGE_NAME:latest .
+        docker push $IMAGE_NAME:latest
+
+    - name: Configure kubectl
+      run: |
+        gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --zone ${{ secrets.GCLOUD_REGION }}
+
+    - name: Deploy to GKE
+      run: |
+        kubectl apply -f tuning-job.yaml
