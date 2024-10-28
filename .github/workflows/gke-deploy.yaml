@@ -16,16 +16,17 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
-    - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v0.2.0
+    
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
       with:
-        project_id: ${{ secrets.GCLOUD_PROJECT }}
-        service_account_key: ${{ secrets.GCLOUD_KEY }}
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
-    - name: Authenticate Docker to Google Container Registry
-      run: |
-        echo "${{ secrets.GCLOUD_KEY }}" | docker login -u _json_key --password-stdin https://gcr.io
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
+
+    - name: 'Use gcloud CLI'
+      run: 'gcloud info'
 
     - name: Build and Push Docker image
       run: |
