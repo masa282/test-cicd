@@ -8,13 +8,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-    - name: Verify environment variables
-      run: |
-        echo "GCP Project ID: ${{ secrets.GCLOUD_PROJECT }}"
-        echo "GKE Cluster: ${{ secrets.GKE_CLUSTER }}"
-        echo "GCP Region: ${{ secrets.GCLOUD_REGION }}"
-        echo "JSOM : ${{ secrets.GCP_CREDENTIALS }}"
       
     - name: Checkout code
       uses: actions/checkout@v2
@@ -33,7 +26,7 @@ jobs:
     - name: Build and Push Docker image
       run: |
         IMAGE_NAME=gcr.io/${{ secrets.GCLOUD_PROJECT }}/xgboost-tuning-task2
-        docker build -t $IMAGE_NAME:latest .
+        docker build -t $IMAGE_NAME:latest -f hyperparameter-tuning/Dockerfile hyperparameter-tuning
         docker push $IMAGE_NAME:latest
 
     - name: Configure kubectl
