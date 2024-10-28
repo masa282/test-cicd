@@ -25,9 +25,10 @@ jobs:
 
     - name: Build and Push Docker image
       run: |
-        IMAGE_NAME=gcr.io/${{ secrets.GCLOUD_PROJECT }}/xgboost-tuning-task2
+        IMAGE_NAME=xgboost-tuning-task2
         docker build -t $IMAGE_NAME:latest -f hyperparameter-tuning/Dockerfile hyperparameter-tuning
-        docker push $IMAGE_NAME:latest
+        docker tag $IMAGE_NAME:latest gcr.io/${{ secrets.GCLOUD_PROJECT }}/$IMAGE_NAME:latest
+        docker push gcr.io/${{ secrets.GCLOUD_PROJECT }}/$IMAGE_NAME:latest
 
     - name: Configure kubectl
       run: |
