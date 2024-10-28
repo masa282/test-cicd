@@ -8,6 +8,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+    - name: Verify environment variables
+      run: |
+        echo "GCP Project ID: ${{ secrets.GCLOUD_PROJECT }}"
+        echo "GKE Cluster: ${{ secrets.GKE_CLUSTER }}"
+        echo "GCP Region: ${{ secrets.GCLOUD_REGION }}"
+        echo "JSOM : ${{ secrets.GCP_CREDENTIALS }}"
+      
     - name: Checkout code
       uses: actions/checkout@v2
     
